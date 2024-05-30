@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct xkcd_comicsApp: App {
+struct XKCDComicsApp: App {
 	var comicViewModel = ComicViewModel()
 	var body: some Scene {
 		WindowGroup {

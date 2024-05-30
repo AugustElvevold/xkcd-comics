@@ -12,7 +12,19 @@ struct MainView: View {
 	
 	var body: some View {
 		VStack {
-			if let comic = viewModel.comics.first {
+			if viewModel.isLoading {
+				VStack {
+					Text("Loading...")
+						.font(.headline)
+						.padding()
+					ProgressView()
+						.frame(width: 300, height: 300)
+						.padding()
+				}
+			} else if let comic = viewModel.comics.first {
+				Text("Comic number: " + String(comic.num))
+					.font(.subheadline)
+					.padding()
 				Text(comic.title)
 					.font(.headline)
 					.padding()
@@ -20,6 +32,8 @@ struct MainView: View {
 					switch phase {
 						case .empty:
 							ProgressView()
+								.frame(width: 300, height: 300)
+								.padding()
 						case .success(let image):
 							image
 								.resizable()
@@ -43,14 +57,22 @@ struct MainView: View {
 				Text("Loading...")
 					.padding()
 			}
+			Button(action: {
+				Task {
+					await viewModel.fetchRandomComic()
+				}
+			}) {
+				Text("Load Random Comic")
+					.padding()
+					.background(Color.blue)
+					.foregroundColor(.white)
+					.cornerRadius(8)
+			}
+			.padding()
 		}
 		.onAppear {
 			Task {
-				do {
-					try await viewModel.fetchLatestComic()
-				} catch {
-					viewModel.errorMessage = error.localizedDescription
-				}
+				await viewModel.fetchLatestComic()
 			}
 		}
 	}
