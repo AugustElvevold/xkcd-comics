@@ -11,6 +11,7 @@ import SwiftData
 struct MainView: View {
 	@Environment(\.modelContext) private var modelContext
 	@Bindable var comicViewModel: ComicViewModel
+	var searchService: XKCDSearchService
 	@State var searchTerm = ""
 	@State private var isSheetPresented = false
 	
@@ -60,7 +61,7 @@ struct MainView: View {
 					.padding(.horizontal)
 					Text(comic.alt)
 						.font(.subheadline)
-					.padding()
+						.padding()
 				} else if let errorMessage = comicViewModel.errorMessage {
 					Text(errorMessage)
 						.foregroundColor(.red)
@@ -81,7 +82,7 @@ struct MainView: View {
 						.tint(.blue)
 						Button() {
 							isSheetPresented = true
-								comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
+							comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
 						} label: {
 							Label("See explanation", systemImage: "questionmark.circle")
 						}
@@ -145,8 +146,11 @@ struct MainView: View {
 					await comicViewModel.fetchComicByNumber(number: number)
 				}
 			} else {
-				// Handle invalid input if needed
-				print("Invalid comic number")
+				if let number = searchService.searchFirstComicID(query: searchTerm) {
+					Task {
+						await comicViewModel.fetchComicByNumber(number: number)
+					}
+				}
 			}
 		}
 		.sheet(isPresented: $isSheetPresented) {
@@ -183,6 +187,9 @@ struct SheetView: View {
 }
 
 #Preview {
-	MainView( comicViewModel: ComicViewModel())
-		.modelContainer(for: Comic.self, inMemory: true)
+	MainView(
+		comicViewModel: ComicViewModel(),
+		searchService: XKCDSearchService()
+	)
+	.modelContainer(for: Comic.self, inMemory: true)
 }

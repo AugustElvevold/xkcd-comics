@@ -11,10 +11,14 @@ import SwiftData
 struct ContentView: View {
 	@Environment(\.modelContext) private var modelContext
 	var comicViewModel: ComicViewModel
+	var searchService: XKCDSearchService
 	
 	var body: some View {
 		TabView {
-			MainView(comicViewModel: comicViewModel)
+			MainView(
+				comicViewModel: comicViewModel,
+				searchService: searchService
+			)
 				.tabItem {
 					Label("Browse comics", systemImage: "house")
 				}
@@ -28,7 +32,8 @@ struct ContentView: View {
 
 #Preview {
 	ContentView(
-		comicViewModel: ComicViewModel()
+		comicViewModel: ComicViewModel(),
+		searchService: XKCDSearchService()
 	)
 		.modelContainer(for: Comic.self)
 }
