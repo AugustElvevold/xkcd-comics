@@ -218,4 +218,31 @@ class ComicViewModel{
 		
 		return cleanedText
 	}
+	
+	func formatNorwegianDate(_ day: String, _ month: String, _ year: String) -> String? {
+		// Create a DateFormatter
+		let dateFormatter = DateFormatter()
+		dateFormatter.locale = Locale(identifier: "nb_NO") // Norwegian locale
+		dateFormatter.dateFormat = "d. MMMM yyyy"
+		
+		// Convert string numbers to integers
+		guard let dayInt = Int(day), let monthInt = Int(month), let yearInt = Int(year) else {
+			return nil
+		}
+		
+		// Create DateComponents
+		var dateComponents = DateComponents()
+		dateComponents.day = dayInt
+		dateComponents.month = monthInt
+		dateComponents.year = yearInt
+		
+		// Get the calendar and convert DateComponents to Date
+		let calendar = Calendar.current
+		if let date = calendar.date(from: dateComponents) {
+			// Format the date to the desired string format
+			return dateFormatter.string(from: date)
+		} else {
+			return nil
+		}
+	}
 }

@@ -27,9 +27,6 @@ struct MainView: View {
 							.padding()
 					}
 				} else if let comic = comicViewModel.comics.first {
-					Text("Comic number: " + String(comic.num))
-						.font(.subheadline)
-						.padding()
 					Text(comic.title)
 						.font(.headline)
 						.padding()
@@ -53,6 +50,16 @@ struct MainView: View {
 								EmptyView()
 						}
 					}
+					HStack{
+						Text("Comic number: " + String(comic.num))
+							.font(.caption)
+						Spacer()
+						Text(comicViewModel.formatNorwegianDate(comic.day, comic.month, comic.year) ?? "")
+							.font(.caption)
+					}
+					.padding(.horizontal)
+					Text(comic.alt)
+						.font(.subheadline)
 					.padding()
 				} else if let errorMessage = comicViewModel.errorMessage {
 					Text(errorMessage)
@@ -63,20 +70,24 @@ struct MainView: View {
 						.padding()
 				}
 				Spacer()
-				VStack(alignment: .trailing, spacing: 20) {
-					Button() {
-						saveComic(comic: comicViewModel.comics.first!)
-					} label: {
-						Label("Lagre", systemImage: "tray.and.arrow.down.fill")
-					}
-					.tint(.blue)
-					Button() {
-						isSheetPresented = true
-							comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
-					} label: {
-						Label("See explanation", systemImage: "questionmark.circle")
+				HStack{
+					Spacer()
+					VStack(alignment: .trailing, spacing: 20) {
+						Button() {
+							saveComic(comic: comicViewModel.comics.first!)
+						} label: {
+							Label("Lagre", systemImage: "tray.and.arrow.down.fill")
+						}
+						.tint(.blue)
+						Button() {
+							isSheetPresented = true
+								comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
+						} label: {
+							Label("See explanation", systemImage: "questionmark.circle")
+						}
 					}
 				}
+				.padding(.horizontal)
 				HStack{
 					Button(action: {
 						Task {

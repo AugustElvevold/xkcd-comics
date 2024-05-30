@@ -33,3 +33,4 @@ Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the e
 4. (1,5t) Save favorite comics to local storage. View a list of local comic titles in SavedView. Only saved image url, since I have not done save image file to persistent storage before. I tried without success, but will try again later if there is time.
 5. (0,5t) Added search comic by number. I started looking at the [xkcd search](https://relevantxkcd.appspot.com) site but all searches was just returning `500 (Internal Server Error)`. So I wont be trying that now.
 6. (2t) Added explanation to comics. I had to look too long for the api. There was a lot of formatting in the response to look for and clean up.
+7. (0,5) Added comic number, alt text (description), and date under the comic.
