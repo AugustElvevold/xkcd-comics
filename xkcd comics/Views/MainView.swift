@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct MainView: View {
+	@Environment(\.modelContext) private var modelContext
 	@Bindable var comicViewModel: ComicViewModel
 	
 	var body: some View {
@@ -58,6 +59,15 @@ struct MainView: View {
 				Text("Loading...")
 					.padding()
 			}
+			Spacer()
+			HStack{
+				Button() {
+					saveComic(comic: comicViewModel.comics.first!)
+				} label: {
+					Label("Lagre", systemImage: "tray.and.arrow.down.fill")
+				}
+				.tint(.blue)
+			}
 			HStack{
 				Button(action: {
 					Task {
@@ -104,6 +114,11 @@ struct MainView: View {
 				}
 			}
 		}
+	}
+	
+	func saveComic(comic: Comic) {
+		modelContext.insert(comic)
+		try? modelContext.save()
 	}
 }
 

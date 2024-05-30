@@ -30,5 +30,5 @@ struct ContentView: View {
 	ContentView(
 		comicViewModel: ComicViewModel()
 	)
-		.modelContainer(for: Comic.self, inMemory: true)
+		.modelContainer(for: Comic.self)
 }

@@ -15,6 +15,6 @@ struct XKCDComicsApp: App {
 		WindowGroup {
 			ContentView(comicViewModel: ComicViewModel())
 		}
-		.modelContainer(for: Comic.self, inMemory: true)
+		.modelContainer(for: Comic.self)
 	}
 }
