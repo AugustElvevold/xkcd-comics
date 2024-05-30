@@ -12,7 +12,7 @@ import Observation
 class ComicViewModel{
 	var comics: [Comic] = []
 	var errorMessage: String?
-	private var latestComicNumber: Int?
+	var latestComicNumber: Int?
 	private var currentComicNumber: Int?
 	var latestComic: Bool {
 		currentComicNumber == latestComicNumber
@@ -29,6 +29,21 @@ class ComicViewModel{
 			DispatchQueue.main.async {
 				self.comics = [comic] // Replace the array with the latest comic
 				self.latestComicNumber = comic.num
+				self.isLoading = false
+			}
+		} catch {
+			DispatchQueue.main.async {
+				self.errorMessage = error.localizedDescription
+			}
+		}
+	}
+	
+	func fetchComicByNumber(number: Int) async {
+		isLoading = true
+		do {
+			let comic = try await fetchComic(from: APIString.comicURL(comicNumber: number))
+			DispatchQueue.main.async {
+				self.comics = [comic] // Replace the array with the comic
 				self.isLoading = false
 			}
 		} catch {
