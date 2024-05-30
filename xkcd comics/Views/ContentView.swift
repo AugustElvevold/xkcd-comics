@@ -14,7 +14,7 @@ struct ContentView: View {
 	
 	var body: some View {
 		TabView {
-			MainView()
+			MainView(comicViewModel: comicViewModel)
 				.tabItem {
 					Label("Browse comics", systemImage: "house")
 				}

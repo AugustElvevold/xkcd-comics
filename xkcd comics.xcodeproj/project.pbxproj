@@ -64,8 +64,8 @@
 			isa = PBXGroup;
 			children = (
 				BE07977B2C0844C700687AF8 /* XKCDComicsApp.swift */,
-				BE0797B62C0851BA00687AF8 /* ViewModel */,
 				BE07978B2C08463C00687AF8 /* Views */,
+				BE0797B62C0851BA00687AF8 /* ViewModel */,
 				BE07978D2C08464C00687AF8 /* Services */,
 				BE07978C2C08464400687AF8 /* Models */,
 				BE0797812C0844C800687AF8 /* Assets.xcassets */,

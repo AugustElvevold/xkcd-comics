@@ -6,13 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MainView: View {
-	var viewModel = ComicViewModel()
+	@Bindable var comicViewModel: ComicViewModel
 	
 	var body: some View {
 		VStack {
-			if viewModel.isLoading {
+			if comicViewModel.isLoading {
 				VStack {
 					Text("Loading...")
 						.font(.headline)
@@ -21,7 +22,7 @@ struct MainView: View {
 						.frame(width: 300, height: 300)
 						.padding()
 				}
-			} else if let comic = viewModel.comics.first {
+			} else if let comic = comicViewModel.comics.first {
 				Text("Comic number: " + String(comic.num))
 					.font(.subheadline)
 					.padding()
@@ -49,7 +50,7 @@ struct MainView: View {
 					}
 				}
 				.padding()
-			} else if let errorMessage = viewModel.errorMessage {
+			} else if let errorMessage = comicViewModel.errorMessage {
 				Text(errorMessage)
 					.foregroundColor(.red)
 					.padding()
@@ -57,28 +58,56 @@ struct MainView: View {
 				Text("Loading...")
 					.padding()
 			}
-			Button(action: {
-				Task {
-					await viewModel.fetchRandomComic()
+			HStack{
+				Button(action: {
+					Task {
+						await comicViewModel.fetchPreviousComic()
+					}
+				}) {
+					Text("Previous")
+						.padding()
+						.background(comicViewModel.firstComic ? Color.gray : Color.blue)
+						.foregroundColor(.white)
+						.cornerRadius(8)
 				}
-			}) {
-				Text("Load Random Comic")
-					.padding()
-					.background(Color.blue)
-					.foregroundColor(.white)
-					.cornerRadius(8)
+				.disabled(comicViewModel.firstComic)
+				Button(action: {
+					Task {
+						await comicViewModel.fetchRandomComic()
+					}
+				}) {
+					Text("Random")
+						.padding()
+						.background(Color.blue)
+						.foregroundColor(.white)
+						.cornerRadius(8)
+				}
+				Button(action: {
+					Task {
+						await comicViewModel.fetchNextComic()
+					}
+				}) {
+					Text("Next")
+						.padding()
+						.background(comicViewModel.latestComic ? Color.gray : Color.blue)
+						.foregroundColor(.white)
+						.cornerRadius(8)
+				}
+				.disabled(comicViewModel.latestComic)
 			}
 			.padding()
 		}
 		.onAppear {
-			Task {
-				await viewModel.fetchLatestComic()
+			if comicViewModel.comics.isEmpty {
+				Task {
+					await comicViewModel.fetchLatestComic()
+				}
 			}
 		}
 	}
 }
 
 #Preview {
-	MainView( viewModel: ComicViewModel())
+	MainView( comicViewModel: ComicViewModel())
 		.modelContainer(for: Comic.self, inMemory: true)
 }

@@ -27,5 +27,6 @@ Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the e
 2. It should be spendt at most 16 hours working on it.
 
 ### The process
-1. I started by setting up the project and the basic structure.
-
+1. (1h) I started by setting up the project and the basic structure. Including loading latest comic from the xkcd API.
+2. (1h) I added get random comic, and rewrote some code to make it easier.
+3. (30m) I added functionality to go to nex ot previous comic.
