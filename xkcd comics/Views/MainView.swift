@@ -12,6 +12,7 @@ struct MainView: View {
 	@Environment(\.modelContext) private var modelContext
 	@Bindable var comicViewModel: ComicViewModel
 	@State var searchTerm = ""
+	@State private var isSheetPresented = false
 	
 	var body: some View {
 		NavigationStack{
@@ -69,6 +70,12 @@ struct MainView: View {
 						Label("Lagre", systemImage: "tray.and.arrow.down.fill")
 					}
 					.tint(.blue)
+					Button() {
+						isSheetPresented = true
+							comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
+					} label: {
+						Label("See explanation", systemImage: "questionmark.circle")
+					}
 				}
 				HStack{
 					Button(action: {
@@ -131,11 +138,36 @@ struct MainView: View {
 				print("Invalid comic number")
 			}
 		}
+		.sheet(isPresented: $isSheetPresented) {
+			SheetView(comic: comicViewModel.comics.first!)
+				.presentationDetents([.height(250), .large])
+		}
 	}
 	
 	func saveComic(comic: Comic) {
 		modelContext.insert(comic)
 		try? modelContext.save()
+	}
+}
+
+struct SheetView: View {
+	@Environment(\.modelContext) private var modelContext
+	var comic: Comic
+	
+	var body: some View {
+		ScrollView {
+			if comic.explanation == "" {
+				ProgressView("Loading...")
+			} else {
+				Text(comic.title + " explanation")
+					.font(.headline)
+					.padding(.top, 20)
+				Text(comic.explanation ?? "No explanation found")
+					.padding()
+			}
+		}
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
+		.background(Color.white)
 	}
 }
 

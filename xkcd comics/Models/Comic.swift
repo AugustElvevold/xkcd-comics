@@ -21,6 +21,7 @@ class Comic: Decodable, Identifiable {
 	var img: String
 	var title: String
 	var day: String
+	var explanation: String?
 	
 	enum CodingKeys: String, CodingKey {
 		case month, num, link, year, news

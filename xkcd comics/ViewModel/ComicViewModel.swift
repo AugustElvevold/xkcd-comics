@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import Combine
 
 @Observable
 class ComicViewModel{
@@ -126,5 +127,95 @@ class ComicViewModel{
 		let (data, _) = try await URLSession.shared.data(from: url)
 		currentComicNumber = try JSONDecoder().decode(Comic.self, from: data).num
 		return try JSONDecoder().decode(Comic.self, from: data)
+	}
+	
+	func fetchExplanation(for comicNumber: Int, comicTitle: String) {
+		print("Fetching explanation for comic \(comicNumber)")
+		let comicTitleFormatted = comicTitle.replacingOccurrences(of: " ", with: "_")
+		let urlString = "https://www.explainxkcd.com/wiki/api.php?action=parse&page=\(comicNumber):_\(comicTitleFormatted)&prop=wikitext&sectiontitle=Explanation&format=json"
+		print("Fetching explanation from: \(urlString)")
+		guard let url = URL(string: urlString) else {
+			self.errorMessage = "Invalid URL"
+			return
+		}
+		
+		URLSession.shared.dataTask(with: url) { data, response, error in
+			if let error = error {
+				DispatchQueue.main.async {
+					self.errorMessage = error.localizedDescription
+				}
+				return
+			}
+			
+			guard let data = data else {
+				DispatchQueue.main.async {
+					self.errorMessage = "No data found"
+				}
+				return
+			}
+			
+			do {
+				let response = try JSONDecoder().decode(ComicExplanationResponse.self, from: data)
+				let wikitext = response.parse.wikitext.text
+				let explanation = self.extractExplanation(from: wikitext)
+				let cleanedExplanation = self.cleanWikitext(explanation)
+				DispatchQueue.main.async {
+					self.comics.first!.explanation = cleanedExplanation
+				}
+			} catch {
+				DispatchQueue.main.async {
+					self.errorMessage = error.localizedDescription
+				}
+			}
+		}.resume()
+	}
+	
+	private func extractExplanation(from wikitext: String) -> String {
+		let explanationStart = "==Explanation=="
+		let transcriptStart = "==Transcript=="
+		
+		if let explanationRange = wikitext.range(of: explanationStart),
+			 let transcriptRange = wikitext.range(of: transcriptStart) {
+			let explanationText = wikitext[explanationRange.upperBound..<transcriptRange.lowerBound]
+			return String(explanationText).trimmingCharacters(in: .whitespacesAndNewlines)
+		}
+		
+		return "Explanation not found."
+	}
+	
+	private func cleanWikitext(_ text: String) -> String {
+		var cleanedText = text
+		
+		// Remove citations {{citation}}
+		cleanedText = cleanedText.replacingOccurrences(of: "\\{\\{citation.*?\\}\\}", with: "", options: .regularExpression)
+		
+		// Remove categories [[:Category:something]]
+		cleanedText = cleanedText.replacingOccurrences(of: "\\[\\[:Category:.*?\\]\\]", with: "", options: .regularExpression)
+		
+		// Remove {{incomplete| ****}}
+		cleanedText = cleanedText.replacingOccurrences(of: "\\{\\{incomplete.*?\\}\\}", with: "", options: .regularExpression)
+		
+		// Replace links [[link|text]] with text or [[text]] with text
+		cleanedText = cleanedText.replacingOccurrences(of: "\\[\\[(?:[^|\\]]*\\|)?([^|\\]]+)\\]\\]", with: "$1", options: .regularExpression)
+		
+		// Remove {{w|text}} formatting
+		cleanedText = cleanedText.replacingOccurrences(of: "\\{\\{w\\|([^|\\]]+)\\}\\}", with: "$1", options: .regularExpression)
+		
+		// Replace {{w|text1|text2}} with text1
+		cleanedText = cleanedText.replacingOccurrences(of: "\\{\\{w\\|([^|\\]]+)\\|([^|\\]]+)\\}\\}", with: "$1", options: .regularExpression)
+		
+		// Replace {{w|text1|text2|text3}} with text1
+		cleanedText = cleanedText.replacingOccurrences(of: "\\{\\{w\\|([^|\\]]+)\\|([^|\\]]+)\\|([^|\\]]+)\\}\\}", with: "$1", options: .regularExpression)
+		
+		// Remove <br> tags
+		cleanedText = cleanedText.replacingOccurrences(of: "<br>", with: "")
+		
+		// Remove HTML links but keep the text
+		cleanedText = cleanedText.replacingOccurrences(of: "\\[https?://[^\\s]*\\s([^\\]]+)\\]", with: "$1", options: .regularExpression)
+		
+		// Remove multiline HTML links but keep the text
+		cleanedText = cleanedText.replacingOccurrences(of: "\\[https?://[^\\s]*\\s([^\\]]+)]\\s*\\n\\[https?://[^\\s]*\\s([^\\]]+)\\]", with: "$1 $2", options: .regularExpression)
+		
+		return cleanedText
 	}
 }
