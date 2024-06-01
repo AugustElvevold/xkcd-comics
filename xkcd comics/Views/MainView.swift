@@ -77,9 +77,18 @@ struct MainView: View {
 						Button() {
 							saveComic(comic: comicViewModel.comics.first!)
 						} label: {
-							Label("Lagre", systemImage: "tray.and.arrow.down.fill")
+							Label("Save", systemImage: "bookmark")
 						}
 						.tint(.blue)
+						if let comic = comicViewModel.comics.first {
+							let urlString = "https://xkcd.com/" + String(comic.num)
+							if let url = URL(string: urlString) {
+								ShareLink(item: url) {
+									Label("Share", systemImage: "square.and.arrow.up")
+								}
+								.tint(.blue)
+							}
+						}
 						Button() {
 							isSheetPresented = true
 							comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
