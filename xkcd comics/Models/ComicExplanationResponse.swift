@@ -1,8 +1,8 @@
 //
-//  Explanation.swift
+//  ComicExplanationResponse.swift
 //  xkcd comics
 //
-//  Created by August Elvevold on 30/05/2024.
+//  Created by August Elvevold on 01/06/2024.
 //
 
 import Foundation
@@ -24,3 +24,4 @@ struct ComicExplanationResponse: Codable {
 	
 	let parse: Parse
 }
+

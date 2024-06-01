@@ -36,3 +36,4 @@ Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the e
 7. (0,5h) Added comic number, alt text (description), and date under the comic.
 8. (1h) Tried search by text again. I found another site that was working [findxkcd](https://findxkcd.com). I looked at the network tab in Inspect element to see what requests was sendt when typing search words. I found it including their api key, and got it working in postman. Then I decoded the jsonresponse to get the comic id and made the app do a normal search by id (comic.num) and display it. 
 9. (0,5h) For sharing the comic I decided to just make an url to the xkcd.com with the comic number concatenated at the end. 
+10. (1,5h) Refactor and clean up code. Move all api calls to APIService.

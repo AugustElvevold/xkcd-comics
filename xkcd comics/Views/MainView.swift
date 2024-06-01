@@ -11,7 +11,6 @@ import SwiftData
 struct MainView: View {
 	@Environment(\.modelContext) private var modelContext
 	@Bindable var comicViewModel: ComicViewModel
-	var searchService: XKCDSearchService
 	@State var searchTerm = ""
 	@State private var isSheetPresented = false
 	
@@ -91,7 +90,9 @@ struct MainView: View {
 						}
 						Button() {
 							isSheetPresented = true
-							comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)
+							Task {
+								await comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)								
+							}
 						} label: {
 							Label("See explanation", systemImage: "questionmark.circle")
 						}
@@ -155,10 +156,8 @@ struct MainView: View {
 					await comicViewModel.fetchComicByNumber(number: number)
 				}
 			} else {
-				if let number = searchService.searchFirstComicID(query: searchTerm) {
-					Task {
-						await comicViewModel.fetchComicByNumber(number: number)
-					}
+				Task {
+					await comicViewModel.fetchComicBySearch(query: searchTerm)
 				}
 			}
 		}
@@ -196,9 +195,6 @@ struct SheetView: View {
 }
 
 #Preview {
-	MainView(
-		comicViewModel: ComicViewModel(),
-		searchService: XKCDSearchService()
-	)
-	.modelContainer(for: Comic.self, inMemory: true)
+	MainView(comicViewModel: ComicViewModel())
+		.modelContainer(for: Comic.self, inMemory: true)
 }

@@ -11,10 +11,12 @@ import Combine
 
 @Observable
 class ComicViewModel{
+	private var currentComicNumber: Int?
+	private let apiService = APIService()
+	
 	var comics: [Comic] = []
 	var errorMessage: String?
 	var latestComicNumber: Int?
-	private var currentComicNumber: Int?
 	var latestComic: Bool {
 		currentComicNumber == latestComicNumber
 	}
@@ -23,95 +25,145 @@ class ComicViewModel{
 	}
 	var isLoading: Bool = false
 	
+	// Fetch the latest comic
 	func fetchLatestComic() async {
 		isLoading = true
 		do {
-			let comic = try await fetchComic(from: APIString.latestComicURL)
+			let comic = try await apiService.fetchComic(from: APIString.latestComicURL)
 			DispatchQueue.main.async {
-				self.comics = [comic] // Replace the array with the latest comic
+				self.comics = [comic]
 				self.latestComicNumber = comic.num
+				self.currentComicNumber = comic.num
 				self.isLoading = false
 			}
 		} catch {
 			DispatchQueue.main.async {
 				self.errorMessage = error.localizedDescription
+				self.isLoading = false
 			}
 		}
 	}
 	
+	// Fetch a comic by its number
 	func fetchComicByNumber(number: Int) async {
 		isLoading = true
 		do {
-			let comic = try await fetchComic(from: APIString.comicURL(comicNumber: number))
+			let comic = try await apiService.fetchComic(from: APIString.comicURL(comicNumber: number))
 			DispatchQueue.main.async {
-				self.comics = [comic] // Replace the array with the comic
+				self.comics = [comic]
+				self.currentComicNumber = comic.num
 				self.isLoading = false
 			}
 		} catch {
 			DispatchQueue.main.async {
 				self.errorMessage = error.localizedDescription
+				self.isLoading = false
 			}
 		}
 	}
 	
+	// Fetch a comic by searching for a query
+	func fetchComicBySearch(query: String) async {
+		isLoading = true
+		do {
+			guard let comicNumber = try await apiService.fetchComicBySearch(query: query) else {
+				DispatchQueue.main.async {
+					self.errorMessage = "No comic found."
+					self.isLoading = false
+				}
+				return
+			}
+			
+			// If a comic is found, fetch it by number to get the same type of object data
+			await fetchComicByNumber(number: comicNumber)
+		} catch {
+			DispatchQueue.main.async {
+				self.errorMessage = error.localizedDescription
+				self.isLoading = false
+			}
+		}
+	}
+	
+	// Fetch a random comic
 	func fetchRandomComic() async {
 		isLoading = true
 		do {
 			if latestComicNumber == nil {
-				await fetchLatestComic() // Ensure latestComicNumber is set
+				await fetchLatestComic()
 			}
-			// Uses latestComicNumber to generate a random comic number that actually exists
 			guard let latestComicNumber = latestComicNumber else { return }
-			
-			let randomComicNumber = Int.random(in: 1...latestComicNumber)
-			let comic = try await fetchComic(from: APIString.comicURL(comicNumber: randomComicNumber))
+			let comic = try await apiService.fetchRandomComic(latestComicNumber: latestComicNumber)
 			DispatchQueue.main.async {
-				self.comics = [comic] // Replace the array with the random comic
+				self.comics = [comic]
+				self.currentComicNumber = comic.num
 				self.isLoading = false
 			}
 		} catch {
 			DispatchQueue.main.async {
 				self.errorMessage = error.localizedDescription
+				self.isLoading = false
 			}
 		}
 	}
 	
+	// Fetch the previous comic based on the current comic number if there are any
 	func fetchPreviousComic() async {
+		if (currentComicNumber == 1) { return }
 		isLoading = true
 		do {
 			if currentComicNumber == nil {
-				await fetchLatestComic() // Ensure currentComicNumber is set
+				await fetchLatestComic()
 			}
-			// Uses currentComicNumber to fetch the previous comic
 			guard let currentComicNumber = currentComicNumber else { return }
-			
 			let previousComicNumber = currentComicNumber - 1
-			let comic = try await fetchComic(from: APIString.comicURL(comicNumber: previousComicNumber))
+			let comic = try await apiService.fetchComic(from: APIString.comicURL(comicNumber: previousComicNumber))
 			DispatchQueue.main.async {
-				self.comics = [comic] // Replace the array with the previous comic
+				self.comics = [comic]
+				self.currentComicNumber = comic.num
 				self.isLoading = false
 			}
 		} catch {
 			DispatchQueue.main.async {
 				self.errorMessage = error.localizedDescription
+				self.isLoading = false
 			}
 		}
 	}
 	
+	// Fetch the next comic based on the current comic number if there are any
 	func fetchNextComic() async {
+		if (currentComicNumber == latestComicNumber) { return }
 		isLoading = true
 		do {
 			if currentComicNumber == nil {
-				await fetchLatestComic() // Ensure currentComicNumber is set
+				await fetchLatestComic()
 			}
-			// Uses currentComicNumber to fetch the next comic
 			guard let currentComicNumber = currentComicNumber else { return }
-			
 			let nextComicNumber = currentComicNumber + 1
-			let comic = try await fetchComic(from: APIString.comicURL(comicNumber: nextComicNumber))
+			let comic = try await apiService.fetchComic(from: APIString.comicURL(comicNumber: nextComicNumber))
 			DispatchQueue.main.async {
-				self.comics = [comic] // Replace the array with the next comic
+				self.comics = [comic]
+				self.currentComicNumber = comic.num
 				self.isLoading = false
+			}
+		} catch {
+			DispatchQueue.main.async {
+				self.errorMessage = error.localizedDescription
+				self.isLoading = false
+			}
+		}
+	}
+	
+	// Fetch the explanation of the current comic
+	func fetchExplanation(for comicNumber: Int, comicTitle: String) async {
+		do {
+			let urlString = APIString.explanationURL(comicNumber: comicNumber, comicTitle: comicTitle)
+			let response = try await apiService.fetchExplanation(from: urlString)
+			let wikitext = response.parse.wikitext.text
+			let explanation = extractExplanation(from: wikitext)
+			let cleanedExplanation = cleanWikitext(explanation)
+			DispatchQueue.main.async {
+				self.comics.first?.explanation = cleanedExplanation
 			}
 		} catch {
 			DispatchQueue.main.async {
@@ -120,56 +172,7 @@ class ComicViewModel{
 		}
 	}
 	
-	private func fetchComic(from url: String) async throws -> Comic {
-		guard let url = URL(string: url) else {
-			throw URLError(.badURL)
-		}
-		let (data, _) = try await URLSession.shared.data(from: url)
-		currentComicNumber = try JSONDecoder().decode(Comic.self, from: data).num
-		return try JSONDecoder().decode(Comic.self, from: data)
-	}
-	
-	func fetchExplanation(for comicNumber: Int, comicTitle: String) {
-		print("Fetching explanation for comic \(comicNumber)")
-		let comicTitleFormatted = comicTitle.replacingOccurrences(of: " ", with: "_")
-		let urlString = "https://www.explainxkcd.com/wiki/api.php?action=parse&page=\(comicNumber):_\(comicTitleFormatted)&prop=wikitext&sectiontitle=Explanation&format=json"
-		print("Fetching explanation from: \(urlString)")
-		guard let url = URL(string: urlString) else {
-			self.errorMessage = "Invalid URL"
-			return
-		}
-		
-		URLSession.shared.dataTask(with: url) { data, response, error in
-			if let error = error {
-				DispatchQueue.main.async {
-					self.errorMessage = error.localizedDescription
-				}
-				return
-			}
-			
-			guard let data = data else {
-				DispatchQueue.main.async {
-					self.errorMessage = "No data found"
-				}
-				return
-			}
-			
-			do {
-				let response = try JSONDecoder().decode(ComicExplanationResponse.self, from: data)
-				let wikitext = response.parse.wikitext.text
-				let explanation = self.extractExplanation(from: wikitext)
-				let cleanedExplanation = self.cleanWikitext(explanation)
-				DispatchQueue.main.async {
-					self.comics.first!.explanation = cleanedExplanation
-				}
-			} catch {
-				DispatchQueue.main.async {
-					self.errorMessage = error.localizedDescription
-				}
-			}
-		}.resume()
-	}
-	
+	// Helper function to extract the explanation from the wikitext
 	private func extractExplanation(from wikitext: String) -> String {
 		let explanationStart = "==Explanation=="
 		let transcriptStart = "==Transcript=="
@@ -183,6 +186,7 @@ class ComicViewModel{
 		return "Explanation not found."
 	}
 	
+	// Helper function to clean the wikitext
 	private func cleanWikitext(_ text: String) -> String {
 		var cleanedText = text
 		
@@ -219,6 +223,7 @@ class ComicViewModel{
 		return cleanedText
 	}
 	
+	// Formats three strings representing a day, month, and year to a Norwegian date format
 	func formatNorwegianDate(_ day: String, _ month: String, _ year: String) -> String? {
 		// Create a DateFormatter
 		let dateFormatter = DateFormatter()
