@@ -135,6 +135,15 @@ struct MainView: View {
 							.cornerRadius(8)
 					}
 					.disabled(comicViewModel.latestComic)
+					Button(action: {
+						forceNotification()
+					}) {
+						Text("Force notification")
+							.padding()
+							.background(Color.blue)
+							.foregroundColor(.white)
+							.cornerRadius(8)
+					}
 				}
 				.padding()
 			}
@@ -170,6 +179,11 @@ struct MainView: View {
 	func saveComic(comic: Comic) {
 		modelContext.insert(comic)
 		try? modelContext.save()
+	}
+	
+	func forceNotification() {
+		UserDefaults.standard.set(100, forKey: "lastComicNum")
+		print("Last comic number: \(UserDefaults.standard.integer(forKey: "lastComicNum"))")
 	}
 }
 

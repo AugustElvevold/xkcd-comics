@@ -34,6 +34,9 @@ class ComicViewModel{
 				self.comics = [comic]
 				self.latestComicNumber = comic.num
 				self.currentComicNumber = comic.num
+				
+				// Save the latest comic number to UserDefaults
+				UserDefaults.standard.set(comic.num, forKey: "lastComicNum")
 				self.isLoading = false
 			}
 		} catch {
