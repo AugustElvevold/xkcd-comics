@@ -18,6 +18,10 @@ struct ContentView: View {
 				.tabItem {
 					Label("Browse comics", systemImage: "house")
 				}
+			SearchView(comicViewModel: comicViewModel)
+				.tabItem {
+					Label("Search comics", systemImage: "magnifyingglass")
+				}
 			SavedView()
 				.tabItem {
 					Label("Saved comics", systemImage: "list.bullet")

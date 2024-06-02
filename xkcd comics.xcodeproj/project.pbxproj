@@ -18,6 +18,8 @@
 		BE0797B82C08522100687AF8 /* ComicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0797B72C08522100687AF8 /* ComicViewModel.swift */; };
 		BE0797C82C0B4E9900687AF8 /* ComicExplanationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0797C72C0B4E9900687AF8 /* ComicExplanationResponse.swift */; };
 		BE0797CA2C0B4EB000687AF8 /* TypesenseResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0797C92C0B4EB000687AF8 /* TypesenseResponse.swift */; };
+		BE0797D42C0CBA0700687AF8 /* ComicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0797D32C0CBA0700687AF8 /* ComicView.swift */; };
+		BE0797D62C0CEDA400687AF8 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0797D52C0CEDA400687AF8 /* SearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		BE0797B72C08522100687AF8 /* ComicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicViewModel.swift; sourceTree = "<group>"; };
 		BE0797C72C0B4E9900687AF8 /* ComicExplanationResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicExplanationResponse.swift; sourceTree = "<group>"; };
 		BE0797C92C0B4EB000687AF8 /* TypesenseResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypesenseResponse.swift; sourceTree = "<group>"; };
+		BE0797D32C0CBA0700687AF8 /* ComicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicView.swift; sourceTree = "<group>"; };
+		BE0797D52C0CEDA400687AF8 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +95,9 @@
 			children = (
 				BE07977D2C0844C700687AF8 /* ContentView.swift */,
 				BE07978F2C08467700687AF8 /* MainView.swift */,
+				BE0797D52C0CEDA400687AF8 /* SearchView.swift */,
 				BE0797912C0846D000687AF8 /* SavedView.swift */,
+				BE0797D32C0CBA0700687AF8 /* ComicView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -196,6 +202,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE0797D42C0CBA0700687AF8 /* ComicView.swift in Sources */,
 				BE07977E2C0844C700687AF8 /* ContentView.swift in Sources */,
 				BE0797962C08485F00687AF8 /* APIService.swift in Sources */,
 				BE0797922C0846D000687AF8 /* SavedView.swift in Sources */,
@@ -205,6 +212,7 @@
 				BE0797CA2C0B4EB000687AF8 /* TypesenseResponse.swift in Sources */,
 				BE0797B82C08522100687AF8 /* ComicViewModel.swift in Sources */,
 				BE0797992C084B3700687AF8 /* Comic.swift in Sources */,
+				BE0797D62C0CEDA400687AF8 /* SearchView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

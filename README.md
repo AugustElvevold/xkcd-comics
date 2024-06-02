@@ -17,16 +17,18 @@ Disregarding the abundance of similar apps, she wants to create a comic viewer a
 * get notifications when a new comic is published,
 * support multiple form factors.
 
-There are a few services available to ease some of the bullet points. 
-There's the [xkcd JSON API](https://xkcd.com/json.html), which can be used to access the comics. 
-Then there's [xkcd search](https://relevantxkcd.appspot.com/), which can help with the search. 
+There are a few services available to ease some of the bullet points.
+There's the [xkcd JSON API](https://xkcd.com/json.html), which can be used to access the comics.
+Then there's [xkcd search](https://relevantxkcd.appspot.com/), which can help with the search.
 Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the explanation for all the comics.
 
 ### Rules
+
 1. The code should be submitted via GitHub.
 2. It should be spendt at most 16 hours working on it.
 
 ### The process
+
 1. (1h) I started by setting up the project and the basic structure. Including loading latest comic from the xkcd API.
 2. (1h) I added get random comic, and rewrote some code to make it easier.
 3. (0,5h) Added functionality to go to nex ot previous comic.
@@ -34,6 +36,13 @@ Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the e
 5. (0,5h) Added search comic by number. I started looking at the [xkcd search](https://relevantxkcd.appspot.com) site but all searches was just returning `500 (Internal Server Error)`. So I wont be trying that now.
 6. (2h) Added explanation to comics. I had to look too long for the api. There was a lot of formatting in the response to look for and clean up.
 7. (0,5h) Added comic number, alt text (description), and date under the comic.
-8. (1h) Tried search by text again. I found another site that was working [findxkcd](https://findxkcd.com). I looked at the network tab in Inspect element to see what requests was sendt when typing search words. I found it including their api key, and got it working in postman. Then I decoded the jsonresponse to get the comic id and made the app do a normal search by id (comic.num) and display it. 
-9. (0,5h) For sharing the comic I decided to just make an url to the xkcd.com with the comic number concatenated at the end. 
+8. (1h) Tried search by text again. I found another site that was working [findxkcd](https://findxkcd.com). I looked at the network tab in Inspect element to see what requests was sendt when typing search words. I found it including their api key, and got it working in postman. Then I decoded the jsonresponse to get the comic id and made the app do a normal search by id (comic.num) and display it.
+9. (0,5h) For sharing the comic I decided to just make an url to the xkcd.com with the comic number concatenated at the end.
 10. (1,5h) Refactor and clean up code. Move all api calls to APIService.
+11. (3h) Tried to add a notification for new comic. The plan was to use the xkcd API to get the latest comic number and compare it to the latest comic number saved in UserDefaults. If it was a new comic I would show a notification. I have not wokred with either backgorund tasks or notifications before, so I had to read a lot of documentation and tutorials. I saved progress on a separate branch so I can focus on other tasks with the remaining time.
+12. (2,5h) I redid a lot of code to be able to scroll through multiple comics in different categories rather than having just one page with buttons. I also moved search to a separate tab for better user experience.
+
+### Known issues
+* Showing explanation for comics is unstable. Sometimes it does not load properly, havent had time to look into it.
+* Saved comics are not very user firendly. They are just placed there to demonstrate saving at the moment.
+* There are a few variables I would like to move to ComicViewModel but dont have time.

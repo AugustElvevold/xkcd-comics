@@ -11,165 +11,65 @@ import SwiftData
 struct MainView: View {
 	@Environment(\.modelContext) private var modelContext
 	@Bindable var comicViewModel: ComicViewModel
-	@State var searchTerm = ""
 	@State private var isSheetPresented = false
+	@State private var selectedComic: Comic?
 	
 	var body: some View {
 		NavigationStack{
 			VStack {
-				if comicViewModel.isLoading {
-					VStack {
-						Text("Loading...")
-							.font(.headline)
-							.padding()
-						ProgressView()
-							.frame(width: 300, height: 300)
-							.padding()
-					}
-				} else if let comic = comicViewModel.comics.first {
-					Text(comic.title)
-						.font(.headline)
-						.padding()
-					AsyncImage(url: URL(string: comic.img)) { phase in
-						switch phase {
-							case .empty:
-								ProgressView()
-									.frame(width: 300, height: 300)
-									.padding()
-							case .success(let image):
-								image
-									.resizable()
-									.scaledToFit()
-									.frame(maxWidth: 300, maxHeight: 300)
-							case .failure:
-								Image(systemName: "photo")
-									.resizable()
-									.scaledToFit()
-									.frame(maxWidth: 300, maxHeight: 300)
-							@unknown default:
-								EmptyView()
-						}
-					}
-					HStack{
-						Text("Comic number: " + String(comic.num))
-							.font(.caption)
-						Spacer()
-						Text(comicViewModel.formatNorwegianDate(comic.day, comic.month, comic.year) ?? "")
-							.font(.caption)
-					}
-					.padding(.horizontal)
-					Text(comic.alt)
-						.font(.subheadline)
-						.padding()
-				} else if let errorMessage = comicViewModel.errorMessage {
-					Text(errorMessage)
-						.foregroundColor(.red)
-						.padding()
-				} else {
-					Text("Loading...")
-						.padding()
-				}
-				Spacer()
-				HStack{
-					Spacer()
-					VStack(alignment: .trailing, spacing: 20) {
-						Button() {
-							saveComic(comic: comicViewModel.comics.first!)
-						} label: {
-							Label("Save", systemImage: "bookmark")
-						}
-						.tint(.blue)
-						if let comic = comicViewModel.comics.first {
-							let urlString = "https://xkcd.com/" + String(comic.num)
-							if let url = URL(string: urlString) {
-								ShareLink(item: url) {
-									Label("Share", systemImage: "square.and.arrow.up")
-								}
-								.tint(.blue)
-							}
-						}
-						Button() {
-							isSheetPresented = true
-							Task {
-								await comicViewModel.fetchExplanation(for: comicViewModel.comics.first!.num, comicTitle: comicViewModel.comics.first!.title)								
-							}
-						} label: {
-							Label("See explanation", systemImage: "questionmark.circle")
-						}
+				Picker("Filter", selection: $comicViewModel.selectedFilter) {
+					ForEach(FilterType.allCases, id: \.self) {
+						Text($0.rawValue)
 					}
 				}
+				.pickerStyle(SegmentedPickerStyle())
 				.padding(.horizontal)
-				HStack{
-					Button(action: {
-						Task {
-							await comicViewModel.fetchPreviousComic()
-						}
-					}) {
-						Text("Previous")
+				.onChange(of: comicViewModel.selectedFilter) { comicViewModel.handleFilterChange() }
+				
+				ScrollView {
+					LazyVStack {
+						ForEach(comicViewModel.currentComics) { comic in
+							ComicView(comic: comic,
+												saveAction: { saveComic(comic: comic) },
+												showExplanationAction: { showExplanation(comic: comic) },
+												comicViewModel: comicViewModel,
+												selectedComic: $selectedComic
+							)
 							.padding()
-							.background(comicViewModel.firstComic ? Color.gray : Color.blue)
-							.foregroundColor(.white)
-							.cornerRadius(8)
-					}
-					.disabled(comicViewModel.firstComic)
-					Button(action: {
-						Task {
-							await comicViewModel.fetchRandomComic()
+							.background(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
 						}
-					}) {
-						Text("Random")
-							.padding()
-							.background(Color.blue)
-							.foregroundColor(.white)
-							.cornerRadius(8)
 					}
-					Button(action: {
-						Task {
-							await comicViewModel.fetchNextComic()
-						}
-					}) {
-						Text("Next")
-							.padding()
-							.background(comicViewModel.latestComic ? Color.gray : Color.blue)
-							.foregroundColor(.white)
-							.cornerRadius(8)
-					}
-					.disabled(comicViewModel.latestComic)
 				}
-				.padding()
+				
+				Spacer()
 			}
-		}
-		.navigationTitle("xkcd comics")
-		.onAppear {
-			if comicViewModel.comics.isEmpty {
-				Task {
-					await comicViewModel.fetchLatestComic()
+			.navigationTitle("xkcd comics")
+			.onAppear {
+				if comicViewModel.newestComics.isEmpty {
+					Task {
+						await comicViewModel.fetchNewestComic()
+					}
 				}
 			}
-		}
-		.searchable(text: $searchTerm, prompt: "Search for comic number")
-		.onSubmit(of: .search) {
-			if let number = Int(searchTerm),
-				 number >= 1,
-				 number <= comicViewModel.latestComicNumber ?? 1000 {
-				Task {
-					await comicViewModel.fetchComicByNumber(number: number)
-				}
-			} else {
-				Task {
-					await comicViewModel.fetchComicBySearch(query: searchTerm)
+			.sheet(isPresented: $isSheetPresented) {
+				if let comic = selectedComic {
+					SheetView(comic: comic)
+						.presentationDetents([.height(250), .large])
 				}
 			}
-		}
-		.sheet(isPresented: $isSheetPresented) {
-			SheetView(comic: comicViewModel.comics.first!)
-				.presentationDetents([.height(250), .large])
 		}
 	}
 	
 	func saveComic(comic: Comic) {
 		modelContext.insert(comic)
 		try? modelContext.save()
+	}
+	
+	func showExplanation(comic: Comic) {
+		Task {
+			await comicViewModel.fetchExplanation(for: comic.num, comicTitle: comic.title)
+			isSheetPresented = true
+		}
 	}
 }
 

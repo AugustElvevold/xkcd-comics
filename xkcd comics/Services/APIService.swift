@@ -66,7 +66,7 @@ class APIService {
 	}
 	
 	// Fetches the first result of a search query
-	func fetchComicBySearch(query: String) async throws -> Int? {
+	func fetchComicBySearch(query: String) async throws -> [Int] {
 		guard let url = URL(string: APIString.searchURL) else {
 			throw URLError(.badURL)
 		}
@@ -89,6 +89,12 @@ class APIService {
 		
 		let (data, _) = try await URLSession.shared.data(for: request)
 		let result = try JSONDecoder().decode(TypesenseResponse.self, from: data)
-		return Int(result.results.first?.hits.first?.document.id ?? "")
+		
+		let comicNumbers = result.results.first?.hits.compactMap { hit in
+			Int(hit.document.id)
+		} ?? []
+		
+		return comicNumbers
 	}
+
 }
