@@ -29,19 +29,19 @@ Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the e
 
 ### The process
 
-1. (1h) I started by setting up the project and the basic structure. Including loading latest comic from the xkcd API.
-2. (1h) I added get random comic, and rewrote some code to make it easier.
-3. (0,5h) Added functionality to go to nex ot previous comic.
-4. (1,5h) Save favorite comics to local storage. View a list of local comic titles in SavedView. Only saved image url, since I have not done save image file to persistent storage before. I tried without success, but will try again later if there is time.
-5. (0,5h) Added search comic by number. I started looking at the [xkcd search](https://relevantxkcd.appspot.com) site but all searches was just returning `500 (Internal Server Error)`. So I wont be trying that now.
-6. (2h) Added explanation to comics. I had to look too long for the api. There was a lot of formatting in the response to look for and clean up.
+1. (1h) Set up the project and basic structure, including loading the latest comic from the xkcd API.
+2. (1h) Added the ability to get a random comic and rewrote some code for better efficiency.
+3. (0,5h) Added functionality to navigate to the next or previous comic.
+4. (1,5h) Save favorite comics to local storage. View a list of saved comic titles in SavedView. Only the image URLs are saved, as saving image files to persistent storage hasn't been implemented yet. An attempt was made without success, but another try will be made later if there is time.
+5. (0,5h)  Added the ability to search for a comic by number. Started looking at the [xkcd search](https://relevantxkcd.appspot.com) site, but all searches returned 500 (Internal Server Error). Therefore, this feature was not pursued further.
+6. (2h) Added explanations to comics. Finding the API took longer than expected. The response required significant formatting and cleanup.
 7. (0,5h) Added comic number, alt text (description), and date under the comic.
-8. (1h) Tried search by text again. I found another site that was working [findxkcd](https://findxkcd.com). I looked at the network tab in Inspect element to see what requests was sendt when typing search words. I found it including their api key, and got it working in postman. Then I decoded the jsonresponse to get the comic id and made the app do a normal search by id (comic.num) and display it.
-9. (0,5h) For sharing the comic I decided to just make an url to the xkcd.com with the comic number concatenated at the end.
-10. (1,5h) Refactor and clean up code. Move all api calls to APIService.
-11. (3h) Tried to add a notification for new comic. The plan was to use the xkcd API to get the latest comic number and compare it to the latest comic number saved in UserDefaults. If it was a new comic I would show a notification. I have not wokred with either backgorund tasks or notifications before, so I had to read a lot of documentation and tutorials. I saved progress on a separate branch so I can focus on other tasks with the remaining time.
-12. (2,5h) I redid a lot of code to be able to scroll through multiple comics in different categories rather than having just one page with buttons. I also moved search to a separate tab for better user experience.* 
-13. (0,5h) Add app icon
+8. (1h) Tried text-based search again. Found another working site, [findxkcd](https://findxkcd.com). Inspected network requests while searching to understand their API usage. Successfully integrated this into the app to perform searches by comic ID and display the results.
+9. (0,5h) Created a URL linking to xkcd.com with the comic number appended at the end for sharing comics.
+10. (1,5h) Refactored and cleaned up the code, moving all API calls to APIService.
+11. (3h) Attempted to add a notification for new comics. The plan was to use the xkcd API to get the latest comic number and compare it with the latest comic number saved in UserDefaults. If there was a new comic, a notification would be shown. Since working with background tasks and notifications was new, considerable time was spent reading documentation and tutorials. Progress was saved on a separate branch to focus on other tasks with the remaining time.
+12. (2,5h) Redid much of the code to enable scrolling through multiple comics in different categories instead of having a single page with buttons. Moved the search function to a separate tab for better user experience.
+13. (0,5h) Added the app icon.
 
 ### Final time:
 
