@@ -40,7 +40,14 @@ Finally, there's [explain xkcd](http://www.explainxkcd.com/), which offers the e
 9. (0,5h) For sharing the comic I decided to just make an url to the xkcd.com with the comic number concatenated at the end.
 10. (1,5h) Refactor and clean up code. Move all api calls to APIService.
 11. (3h) Tried to add a notification for new comic. The plan was to use the xkcd API to get the latest comic number and compare it to the latest comic number saved in UserDefaults. If it was a new comic I would show a notification. I have not wokred with either backgorund tasks or notifications before, so I had to read a lot of documentation and tutorials. I saved progress on a separate branch so I can focus on other tasks with the remaining time.
-12. (2,5h) I redid a lot of code to be able to scroll through multiple comics in different categories rather than having just one page with buttons. I also moved search to a separate tab for better user experience.
+12. (2,5h) I redid a lot of code to be able to scroll through multiple comics in different categories rather than having just one page with buttons. I also moved search to a separate tab for better user experience.* 
+13. (0,5h) Add app icon
+
+### Final time:
+
+<img width="476" alt="Skjermbilde 2024-06-02 kl  20 43 51" src="https://github.com/AugustElvevold/xkcd-comics/assets/89490288/ffe6e2e5-c8a1-4e8a-8bdc-c15d925a24b8">
+
+
 
 ### Known issues
 * Showing explanation for comics is unstable. Sometimes it does not load properly, havent had time to look into it.
